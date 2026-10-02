@@ -48,7 +48,7 @@ export class Weapon extends Component {
             barrelNode.setParent(this.node);
 
             let barrelComp = barrelNode.addComponent(Barrel);
-            barrelComp.initialize(barrelData.pos, barrelData.angles, barrelData.size);
+            barrelComp.initialize(barrelData.pos, barrelData.angle, barrelData.size);
             this.barrels.push(barrelComp);
         }
     }
