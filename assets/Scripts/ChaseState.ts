@@ -14,7 +14,7 @@ export class ChaseState implements IState {
             brain.node.worldPosition.y)
 
         if (brain.getDistanceToPlayer(myPos)>brain.losePlayerDistance){
-            brain.changeState(brain.patrolState)
+            brain.changeState(brain.lostPlayerState)
             return
         }
 
