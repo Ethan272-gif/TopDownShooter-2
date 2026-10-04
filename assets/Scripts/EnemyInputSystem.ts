@@ -1,28 +1,54 @@
 import { _decorator, Component, math, Node, Vec2 } from 'cc';
 import { SeekBehavior } from './SeekBehavior';
 import { IInputSystem } from './IInputSystem';
+import { WanderBehavior } from './WanderBehavior';
+import { IState } from './IState';
+import { ArrivedState } from './ArrivedState';
+import { PatrolState } from './PatrolState';
 const { ccclass, property } = _decorator;
 
 @ccclass('EnemyInputSystem')
 export class EnemyInputSystem extends Component implements IInputSystem{
 
-    private seek: SeekBehavior=new SeekBehavior()
-    private targetNode: Node | null = null
 
-    public initialize(targetNode: Node){
-        this.targetNode=targetNode
+    // private seek: SeekBehavior=new SeekBehavior()
+    public wander: WanderBehavior= new WanderBehavior()
+    // private targetNode: Node | null = null
+
+    public patrolState: PatrolState=new PatrolState()
+    public arrivedState: ArrivedState=new ArrivedState()
+
+    private currentState: IState | null=null
+    private currentMoveDir: Vec2=new Vec2
+
+    public initialize(wayPoints: Vec2[]){
+        this.wander.setWayPoints(wayPoints)
+
+        this.changeState(this.patrolState)
     }
 
-    public getMoveDirection(): Vec2{
+    public changeState(newState: IState){
+        if (this.currentState && this.currentState != newState){
+            this.currentState.exit(this)
+        }
+        if (this.currentState != newState){
+            this.currentState=newState
+            this.currentState.enter(this)
+        }
+    }
 
-        if (!this.targetNode) return Vec2.ZERO
+    public processFSM(dt: number){
+        if (this.currentState){
+            this.currentState.execute(this, dt)
+        }
+    }
 
-        let currentPos=new Vec2(
-            this.node.worldPosition.x, this.node.worldPosition.y)
-        let targetPos=new Vec2(
-            this.targetNode.worldPosition.x, this.targetNode.worldPosition.y)
+    public setMoveDirection(dir: Vec2){
+        this.currentMoveDir=dir
+    }
 
-        return this.seek.getDesiredVelocity(currentPos, targetPos)
+    public getMoveDirection(): Vec2{ 
+        return this.currentMoveDir
     }
 
     public getRotationAngle(): number {
