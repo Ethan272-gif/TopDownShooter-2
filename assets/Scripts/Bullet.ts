@@ -1,4 +1,5 @@
 import { _decorator, Collider2D, Component, Contact2DType, IPhysics2DContact, Node, NodePool, RigidBody2D, Vec2 } from 'cc';
+import { HealthSystem } from './HealthSystem';
 const { ccclass, property } = _decorator;
 
 @ccclass('Bullet')
@@ -40,6 +41,12 @@ export class Bullet extends Component {
     private onBeginContact(selfCollider: Collider2D, otherCollider: Collider2D, contact: IPhysics2DContact | null){
         if (this.isHit) return
 
+        let healthComp=otherCollider.node.getComponent(HealthSystem)
+
+        if (healthComp){
+            healthComp.takeDamage(this.damageAmount)
+        }
+        
         this.isHit=true
     }
 

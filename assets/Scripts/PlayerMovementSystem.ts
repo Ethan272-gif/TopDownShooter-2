@@ -13,8 +13,10 @@ export class PlayerMovementSystem extends Component {
         this.rigiBody=this.getComponent(RigidBody2D)
     }
 
-    public updateRotation(angleDegrees: number): void{
-        this.node.angle=angleDegrees
+    public updateRotation(angleDegrees: number | null): void{
+        if (angleDegrees!=null){
+            this.node.angle=angleDegrees
+        }
     }
     public updateMovement(moveDir:Vec2): void{
         if (!this.rigiBody) return
