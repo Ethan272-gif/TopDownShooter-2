@@ -10,6 +10,12 @@ export class PatrolState implements IState {
     execute(brain: EnemyInputSystem, dt: number): void {
         
         let myPos = new Vec2(brain.node.worldPosition.x, brain.node.worldPosition.y)
+
+        if (brain.getDistanceToPlayer(myPos)<brain.spotPlayerDistance){
+            brain.changeState(brain.chaseState)
+            return
+        }
+        
         
         if (brain.wander.hasArrived(myPos)){
             brain.wander.pickNewWanderPoint()
