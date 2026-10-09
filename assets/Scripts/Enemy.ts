@@ -50,6 +50,9 @@ export class Enemy extends Component {
 
         if (this.inputSystem && this.movementSystem){
 
+            let isSlow=this.movementSystem.isMovingSlowly()
+            this.inputSystem.isMovingSlowly=isSlow
+
             this.inputSystem.processFSM(deltaTime)
 
             let moveDir=this.inputSystem.getMoveDirection()
