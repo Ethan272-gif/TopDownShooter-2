@@ -2,7 +2,7 @@ import { _decorator, Component, find, input, Node, Vec2 } from 'cc';
 import { EnemyInputSystem } from './EnemyInputSystem';
 import { EnemyMovementSystem } from './EnemyMovementSystem';
 import { HealthSystem } from './HealthSystem';
-import { IntentConfig } from './EnemyConfig';
+import { IntentConfig, MovementConfig } from './EnemyConfig';
 const { ccclass, property } = _decorator;
 
 @ccclass('Enemy')
@@ -14,10 +14,17 @@ export class Enemy extends Component {
     @property({group: 'Intent Weights', slide: true, range: [0,5, 0.1]})
     public fleeWeight: number=0.0
 
+    @property({group: 'Movement Weights', slide: true, range:[0, 5, 0.1]})
+    public maxSpeed: number=4
+
+    @property({group: 'Movement Weights', slide: true, range: [0, 1, 0.1]})
+    public maxTurnForce: number=0.2
+
     private inputSystem: EnemyInputSystem | null=null
     private movementSystem: EnemyMovementSystem | null=null
     private healthSystem: HealthSystem | null=null
     private intentConfig: IntentConfig
+    private movementConfig: MovementConfig
 
     private targetNode: Node | null=null
 
@@ -34,6 +41,11 @@ export class Enemy extends Component {
             seekWeight: this.seekWeight,
             fleeWeight: this.fleeWeight
         }
+
+        this.movementConfig={
+            maxSpeed: this.maxSpeed,
+            maxTurnForce: this.maxTurnForce
+        }
         
     }
 
@@ -45,6 +57,10 @@ export class Enemy extends Component {
             )
             this.inputSystem.initialize(this.targetNode, wanderPoints, this.intentConfig)
             
+        }
+
+        if (this.movementSystem){
+            this.movementSystem.init(this.movementConfig)
         }
     }
 
