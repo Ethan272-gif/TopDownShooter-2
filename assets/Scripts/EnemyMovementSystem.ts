@@ -1,12 +1,17 @@
-import { _decorator, Component, math, Node, RigidBody, RigidBody2D, Vec2 } from 'cc';
+import { _decorator, Component, Graphics, math, Node, RigidBody, RigidBody2D, Vec2 } from 'cc';
 import { MovementConfig } from './EnemyConfig';
+import { TacticalSteeringBehavior } from './TacticalSteeringBehavior';
 const { ccclass, property } = _decorator;
 
 @ccclass('EnemyMovementSystem')
 export class EnemyMovementSystem extends Component {
 
+    @property({type: Graphics})
+    public debugGraphics: Graphics | null=null
+
     private maxSpeed: number | null=null
     private maxTurnForce: number | null=null
+    private teacticalSteering: TacticalSteeringBehavior
     private rigidBody: RigidBody2D | null=null
 
     protected onLoad(): void {
@@ -16,6 +21,7 @@ export class EnemyMovementSystem extends Component {
     public init(movementConfig: MovementConfig){
         this.maxSpeed=movementConfig.maxSpeed
         this.maxTurnForce=movementConfig.maxTurnForce
+        this.teacticalSteering=new TacticalSteeringBehavior(movementConfig, this)
     }
 
     public updateRotation(angleDegrees: number | null){
@@ -33,13 +39,25 @@ export class EnemyMovementSystem extends Component {
     public getVelocity(): Vec2{
         return this.rigidBody ? this.rigidBody.linearVelocity.clone() : Vec2.ZERO
     }
+
     public updateMovement(moveDir: Vec2){
         if (!this.rigidBody) return
 
         let currentVelocity=this.getVelocity()
 
+        let currentPosition=new Vec2(this.node.worldPosition.x, this.node.worldPosition.y)
+
+        let tacticalAdjustments=this.teacticalSteering.getDesiredVelocity(currentPosition)
+
+        let combinedForces=new Vec2
+        Vec2.add(combinedForces, tacticalAdjustments, moveDir)
+
+        if (combinedForces.lengthSqr()>1.0){
+            combinedForces.normalize()
+        }
+
         let desiredVelocity=new Vec2
-        Vec2.multiplyScalar(desiredVelocity,moveDir, this.maxSpeed)
+        Vec2.multiplyScalar(desiredVelocity, combinedForces, this.maxSpeed)
 
         let steeringForce=new Vec2
         Vec2.subtract(steeringForce, desiredVelocity, currentVelocity)
