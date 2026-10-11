@@ -11,8 +11,9 @@ export class SeperationBehavior implements ISeeringBehavior {
         this.brain=movementSystem
         this.separationRadius=separationRadius
     }
+
     getDesiredVelocity(currentPosition: math.Vec2, targetPosition?: Readonly<math.Vec2>): math.Vec2 {
-        let neighbors=this.brain.getNeighbors()
+        let neighbors=this.brain.getNeighborData()
         let separationForce=new Vec2
 
         if(neighbors.length<=0) return separationForce
@@ -20,7 +21,7 @@ export class SeperationBehavior implements ISeeringBehavior {
         let pushCount=0
 
         for(let neighbor of neighbors){
-            let distance=Vec2.distance(currentPosition, neighbor)
+            let distance=Vec2.distance(currentPosition, neighbor.position)
 
             if(distance<this.separationRadius){
                 let pushVector=new Vec2
@@ -29,7 +30,7 @@ export class SeperationBehavior implements ISeeringBehavior {
                     pushVector.set(math.randomRange(-0.1,0.1), math.randomRange(-0.1,0.1))
                 }
                 else{
-                    Vec2.subtract(pushVector, currentPosition, neighbor)
+                    Vec2.subtract(pushVector, currentPosition, neighbor.position)
                     pushVector.normalize()
                     let strength=1.0-(distance/this.separationRadius)
                     pushVector.multiplyScalar(strength)
