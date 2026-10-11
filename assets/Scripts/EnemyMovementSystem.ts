@@ -1,6 +1,7 @@
 import { _decorator, Component, Graphics, math, Node, RigidBody, RigidBody2D, Vec2 } from 'cc';
 import { MovementConfig } from './EnemyConfig';
 import { TacticalSteeringBehavior } from './TacticalSteeringBehavior';
+import { Enemy } from './Enemy';
 const { ccclass, property } = _decorator;
 
 @ccclass('EnemyMovementSystem')
@@ -83,6 +84,24 @@ export class EnemyMovementSystem extends Component {
         return this.rigidBody.linearVelocity.lengthSqr()<10
     }
 
+
+    public getNeighbors(): Vec2[] {
+        let neighbors: Vec2[]=[]
+        for (let otherEnemy of Enemy.activeEnemies){
+            if (otherEnemy.node === this.node) continue
+
+            let otherPos=new Vec2(
+                otherEnemy.node.worldPosition.x,
+                otherEnemy.node.worldPosition.y
+            )
+
+            neighbors.push(otherPos)
+        }
+
+        return neighbors
+    }
+
+    
 }
 
 
