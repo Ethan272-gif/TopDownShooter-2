@@ -16,8 +16,17 @@ export class Enemy extends Component {
     @property({group: 'Intent Weights', slide: true, range: [0,5, 0.1]})
     public fleeWeight: number=0.0
 
-    @property({group: 'Movement Weights', slide: true, range:[0, 5, 0.1]})
+    @property({group: 'Intent Weights', slide: true, range: [0,5, 0.1]})
+    public maxPredictionTime: number=2.0
+
+    @property({group: 'Intent Weights', slide: true, range: [0,5, 0.1]})
     public maxSpeed: number=4
+
+    @property({group: 'Intent Weights', slide: true, range: [0, 500, 10]})
+    public spotPlayerDistance: number=200
+
+    @property({group: 'Intent Weights', slide: true, range: [0, 500, 10]})
+    public lostPlayerDistance: number=250
 
     @property({group: 'Movement Weights', slide: true, range: [0, 1, 0.1]})
     public maxTurnForce: number=0.2
@@ -65,11 +74,14 @@ export class Enemy extends Component {
         
         this.intentConfig={
             seekWeight: this.seekWeight,
-            fleeWeight: this.fleeWeight
+            fleeWeight: this.fleeWeight,
+            maxSpeed: this.maxSpeed,
+            maxPredictionTime: this.maxPredictionTime,
+            spotPlayerDistance: this.spotPlayerDistance,
+            lostPlayerDistance: this.lostPlayerDistance
         }
 
         this.movementConfig={
-            maxSpeed: this.maxSpeed,
             maxTurnForce: this.maxTurnForce,
             avoidWeight: this.avoidWeight,
             flocking:{
@@ -103,7 +115,7 @@ export class Enemy extends Component {
         }
 
         if (this.movementSystem){
-            this.movementSystem.init(this.movementConfig)
+            this.movementSystem.init(this.intentConfig.maxSpeed, this.movementConfig)
         }
     }
 

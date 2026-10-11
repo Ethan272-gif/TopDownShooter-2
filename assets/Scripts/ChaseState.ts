@@ -41,7 +41,7 @@ export class ChaseState implements IState {
             this.stuckTimer=0
         }
 
-        let dir=brain.compositeIntent.getDesiredVelocity(myPos, brain.getPlayerPos())
+        let dir=brain.compositeIntent.getDesiredVelocity(myPos, brain.getPlayerPos(), brain.getTargetVelocity())
         brain.setMoveDirection(dir)
     }
     exit(brain: EnemyInputSystem): void {
