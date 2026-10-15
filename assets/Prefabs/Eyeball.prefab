@@ -552,7 +552,7 @@
     "__prefab": {
       "__id__": 25
     },
-    "enabledContactListener": false,
+    "enabledContactListener": true,
     "bullet": false,
     "awakeOnLoad": true,
     "_group": 4,
@@ -593,7 +593,7 @@
     "_restitution": 0,
     "_offset": {
       "__type__": "cc.Vec2",
-      "x": 1.4,
+      "x": 1.2,
       "y": 3.1
     },
     "_radius": 14.2,
@@ -614,17 +614,10 @@
     "__prefab": {
       "__id__": 29
     },
-    "seekWeight": 1,
-    "fleeWeight": 0,
-    "maxSpeed": 4,
-    "maxTurnForce": 0.2,
-    "avoidWeight": 3,
-    "seperationWeight": 1.1,
-    "seperationRadius": 100,
-    "alignmentWeight": 3,
-    "alignmentRadius": 100,
-    "cohesionWeight": 2,
-    "cohesionRadius": 245,
+    "testConfigFiles": {
+      "__uuid__": "f675ac64-d125-44a3-83fe-29934c5affec",
+      "__expectedType__": "cc.JsonAsset"
+    },
     "_id": ""
   },
   {

@@ -44,7 +44,7 @@ export class Weapon extends Component {
     private setUpBarrels(config: WeaponConfig) {
         for (let i = 0; i < config.barrels.length; i++) {
             let barrelData = config.barrels[i];
-            let barrelNode = new Node('Barrel_${i}');
+            let barrelNode = new Node(`Barrel_${i}`);
             barrelNode.setParent(this.node);
 
             let barrelComp = barrelNode.addComponent(Barrel);

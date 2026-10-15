@@ -1,4 +1,4 @@
-import { _decorator, Component, find, input, Node, Vec2 } from 'cc';
+import { _decorator, Component, find, input, JsonAsset, Node, Vec2, log } from 'cc';
 import { EnemyInputSystem } from './EnemyInputSystem';
 import { EnemyMovementSystem } from './EnemyMovementSystem';
 import { HealthSystem } from './HealthSystem';
@@ -18,14 +18,32 @@ export class Enemy extends Component {
     private movementConfig: MovementConfig
 
     private targetNode: Node | null=null
+    private configLoaded: boolean=false
 
+    @property({type: JsonAsset})
+    public testConfigFiles: JsonAsset | null=null
+
+    
     protected onLoad(): void {
 
         Enemy.activeEnemies.push(this)
     }
 
+    protected start(): void {
+        if(!this.configLoaded){
+            if(this.testConfigFiles && this.testConfigFiles.json){
+                let configData=this.testConfigFiles.json as unknown as EnemyConfig
+                log(`[Enemy] Reading configuration ${this.testConfigFiles.name}`)
+                this.init(configData)
+            }
+            else{
+                log('[Enemy] No JSON config file attached')
+            }
+        }
+    }
+
     public init(enemyConfig: EnemyConfig){
-        if(!this.inputSystem){
+        if(!this.configLoaded){
             this.inputSystem=this.getComponent(EnemyInputSystem)
         }
         if(!this.movementSystem){
@@ -34,6 +52,8 @@ export class Enemy extends Component {
         if(!this.healthSystem){
             this.healthSystem=this.getComponent(HealthSystem)
         }
+
+        this.configLoaded=true
 
         this.node.setScale(enemyConfig.scale.x,enemyConfig.scale.y)
 
