@@ -120,7 +120,7 @@ export class WaveManager extends Component {
 
         this.activeEnemies=this.waveFactory.buildWave(this.currentWaveIndex)
         log(`[Spawn Wave] ${this.activeEnemyCount}`)
-        EventBus.emit(GameEvents.WAVE_SPAWNED)
+        EventBus.emit(GameEvents.WAVE_SPAWNED, this.activeEnemies)
     }
 
 }
