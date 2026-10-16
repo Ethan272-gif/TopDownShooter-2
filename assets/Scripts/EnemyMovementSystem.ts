@@ -1,7 +1,8 @@
-import { _decorator, Component, Graphics, math, Node, RigidBody, RigidBody2D, Vec2 } from 'cc';
+import { _decorator, Component, Graphics, isValid, math, Node, RigidBody, RigidBody2D, Vec2 } from 'cc';
 import { MovementConfig } from './EnemyConfig';
 import { TacticalSteeringBehavior } from './TacticalSteeringBehavior';
 import { Enemy } from './Enemy';
+import { EventBus, GameEvents } from './EventBus';
 const { ccclass, property } = _decorator;
 
 export interface NeighborData{
@@ -19,9 +20,11 @@ export class EnemyMovementSystem extends Component {
     private maxTurnForce: number | null=null
     private teacticalSteering: TacticalSteeringBehavior
     private rigidBody: RigidBody2D | null=null
+    private sharedActiveEnemies: Enemy[]=[]
 
     protected onLoad(): void {
         this.rigidBody=this.getComponent(RigidBody2D)
+        EventBus.on(GameEvents.WAVE_SPAWNED, this.reciveEnemyArray, this)
     }
 
     public init(maxSpeed: number, movementConfig: MovementConfig){
@@ -89,11 +92,19 @@ export class EnemyMovementSystem extends Component {
         return this.rigidBody.linearVelocity.lengthSqr()<10
     }
 
+    private reciveEnemyArray(masterArray: Enemy[]){
+        this.sharedActiveEnemies=masterArray
+    }
+
 
     public getNeighborData(): NeighborData[] {
         let neighbors: NeighborData[]=[]
-        for (let otherEnemy of Enemy.activeEnemies){
-            if (otherEnemy.node === this.node) continue
+
+        if(!this.sharedActiveEnemies || this.sharedActiveEnemies.length===0) return neighbors
+
+        for (let otherEnemy of this.sharedActiveEnemies){
+
+            if (!isValid(otherEnemy) || !otherEnemy.node || otherEnemy.node === this.node) continue
 
             let otherMovement=otherEnemy.getComponent(EnemyMovementSystem)
             if(!otherMovement) continue
@@ -111,7 +122,9 @@ export class EnemyMovementSystem extends Component {
         return neighbors
     }
 
+    protected onDestroy(): void {
+        EventBus.off(GameEvents.WAVE_SPAWNED, this.reciveEnemyArray, this)
+    }
     
 }
-
 

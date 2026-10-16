@@ -3,21 +3,19 @@ import { EnemyInputSystem } from './EnemyInputSystem';
 import { EnemyMovementSystem } from './EnemyMovementSystem';
 import { HealthSystem } from './HealthSystem';
 import { EnemyConfig, IntentConfig, MovementConfig } from './EnemyConfig';
+import { EventBus, GameEvents } from './EventBus';
 const { ccclass, property } = _decorator;
 
 @ccclass('Enemy')
 export class Enemy extends Component {
 
-    public static activeEnemies: Enemy[]=[]
+    
 
 
     private inputSystem: EnemyInputSystem | null=null
     private movementSystem: EnemyMovementSystem | null=null
     private healthSystem: HealthSystem | null=null
-    private intentConfig: IntentConfig
-    private movementConfig: MovementConfig
-
-    private targetNode: Node | null=null
+    
     private configLoaded: boolean=false
 
     @property({type: JsonAsset})
@@ -26,7 +24,7 @@ export class Enemy extends Component {
     
     protected onLoad(): void {
 
-        Enemy.activeEnemies.push(this)
+        
     }
 
     protected start(): void {
@@ -42,7 +40,7 @@ export class Enemy extends Component {
         }
     }
 
-    public init(enemyConfig: EnemyConfig){
+    public init(enemyConfig: EnemyConfig, providedTarget?: Node, providedWandersPoints?:Vec2[]){
         if(!this.configLoaded){
             this.inputSystem=this.getComponent(EnemyInputSystem)
         }
@@ -63,11 +61,14 @@ export class Enemy extends Component {
         }
           
         if (this.inputSystem){
-            this.targetNode=find("Canvas/Player")
-            let wanderPoints=this.node.getParent().getChildByName("WanderNodes").children.map(
-                child=>new Vec2(child.worldPosition.x,child.worldPosition.y)
-            )
-            this.inputSystem.initialize(this.targetNode, wanderPoints, enemyConfig.intent)
+            let targetNode=providedTarget || find("Canvas/Player")
+            let wanderPoints=providedWandersPoints
+            if(!wanderPoints){
+                this.node.getParent().getChildByName("WanderNodes").children.map(
+                child=>new Vec2(child.worldPosition.x,child.worldPosition.y))
+            }
+            
+            this.inputSystem.initialize(targetNode, wanderPoints, enemyConfig.intent)
             
         }
 
@@ -117,10 +118,7 @@ export class Enemy extends Component {
     }
 
     protected onDestroy(): void {
-        let index=Enemy.activeEnemies.indexOf(this)
-        if(index>-1){
-            Enemy.activeEnemies.splice(index, 1)
-        }
+        EventBus.emit(GameEvents.ENEMY_DIED, this)
     }
 }
 
