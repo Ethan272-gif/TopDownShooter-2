@@ -73,7 +73,7 @@ export class PowerUpManager extends Component {
 
         for(let currentConfg of this.dropPool){
             currentWeight+=currentConfg.weight
-            if(randomValue<=currentConfg.weight){
+            if(randomValue<=currentWeight){
                 chosenPowerUpConfig=currentConfg
                 break
             }
